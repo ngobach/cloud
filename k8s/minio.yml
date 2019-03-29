@@ -1,0 +1,65 @@
+# Minio
+# (c) BachNX <thanbaiks@gmail.com>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        image: minio/minio
+        args: ['server', '/data']
+        ports:
+        - name: http
+          containerPort: 9000
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        envFrom:
+        - secretRef:
+            name: minio
+            optional: true
+      volumes:
+      - name: data
+        hostDir: /var/k8s/minio
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: minio
+  name: minio-svc
+spec:
+  ports:
+  - port: 9000
+    protocol: TCP
+    targetPort: 9000
+  selector:
+    app: minio
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: minio-ingress
+spec:
+  rules:
+  - host: minio.ngobach.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: minio-svc
+          servicePort: 9000
