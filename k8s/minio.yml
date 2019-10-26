@@ -33,7 +33,9 @@ spec:
             optional: true
       volumes:
       - name: data
-        hostDir: /var/k8s/minio
+        hostPath:
+          path: /var/k8s/minio
+          type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: Service
