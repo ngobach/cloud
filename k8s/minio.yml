@@ -1,6 +1,13 @@
 # Minio
 # (c) BachNX <thanbaiks@gmail.com>
 ---
+apiVerison: v1
+kind: Secret
+metadata:
+  name: minio
+data:
+  TODO: TODO
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:

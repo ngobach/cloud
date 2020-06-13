@@ -1,0 +1,62 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ampache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ampache
+  template:
+    metadata:
+      labels:
+        app: ampache
+    spec:
+      containers:
+      - name: ampache
+        image: ampache/ampache
+        ports:
+        - containerPort: 80
+          name: http
+        volumeMounts:
+        - mountPath: /media
+          name: data
+        resources:
+          limits:
+            memory: 256M
+            cpu: 100m
+      volumes:
+      - name: data
+        hostPath:
+          path: /var/k8s/ampache
+          type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ampache
+  name: ampache
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app: ampache
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ampache
+spec:
+  rules:
+  - host: ampache.ngobach.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: ampache
+          servicePort: 80

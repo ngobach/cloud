@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: wmapi
+  name: wmapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wmapi
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: wmapi
+    spec:
+      containers:
+      - image: thanbaiks/wm
+        name: wm
+        resources: {}
+        ports:
+        - containerPort: 8000
+          name: http

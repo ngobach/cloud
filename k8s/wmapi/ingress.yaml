@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: wmapi
+  labels:
+    app: wmapi
+spec:
+  rules:
+  - host: cov.ngobach.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: wmapi
+          servicePort: 80-http

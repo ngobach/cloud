@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: k8s-dashboard
+  labels:
+    app: k8s-dashboard
+spec:
+  rules:
+  - host: dashboard.139-99-45-195.nip.io
+    http:
+      paths:
+      - backend:
+          serviceName: k8dash
+          servicePort: http

@@ -1,0 +1,81 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+          name: http
+        volumeMounts:
+        - mountPath: /etc/nginx/conf.d
+          name: nginx-config
+        resources:
+          limits:
+            memory: 128M
+            cpu: 100m
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nginx
+  name: nginx
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: nginx
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nginx
+spec:
+  rules:
+  - host: sgp.ngobach.com
+    http:
+      paths:
+      - backend:
+          serviceName: nginx
+          servicePort: http
+---
+kind: ConfigMap
+apiVersion: v1
+data:
+  app.conf: |+
+    server {
+        listen       80;
+        server_name  sgp.ngobach.com;
+        root   /usr/share/nginx/html;
+        #location / {
+        #  proxy_pass http://10.95.0.3:8081/;
+        #}
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/share/nginx/html;
+        }
+    }
+
+metadata:
+  name: nginx-config
